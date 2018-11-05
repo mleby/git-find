@@ -115,7 +115,7 @@ func findBranches(commits []string, remote bool) {
 	}
 	if len(branches) > 0 {
 		sort.Strings(branches)
-		// TODO Lebeda - unique
+		branches = scripttools.RemoveDuplicates(branches)
 		fmt.Println("\n" + branchType + " branches:")
 		for _, tag := range branches {
 			fmt.Println(tag)
