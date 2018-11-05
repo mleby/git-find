@@ -22,6 +22,7 @@ dep:
   go get github.com/mattn/go-sqlite3
   go get github.com/fatih/color
   go get github.com/inconshreveable/mousetrap # for windows compilation
+  go get gopkg.in/pipe.v2
 
 # run testing
 # test: resources
@@ -29,7 +30,7 @@ dep:
 
 # copy release binary to ~/bin directory
 install: build
-  cp -v bin/dict ~/bin/
+  cp -v bin/git-find ~/bin/
 
 # clean all temporary files
 clean:
