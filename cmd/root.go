@@ -25,35 +25,23 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
+var optCommits bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "git-find",
-	Args:  cobra.ExactArgs(1), // TODO Lebeda - more then 1 arg
+	Args:  cobra.MinimumNArgs(1),
 	Short: "find keyword in got log.",
 	Long:  `Find keyword in got log and list all commits, tags and branches contain it.`,
 	// TODO Lebeda - usage
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// find commits
-		p := pipe.Line(
-			pipe.Exec("git", "--no-pager", "log", "--all", "--oneline", "-i", "--grep="+args[0]),
-			//	pipe.Filter(func(line []byte) bool {return bytes.Contains(line, []byte("MCV")) }),
-		)
-		split := scripttools.GetOutputLines(p)
-
 		var commits []string
-
-		if len(split) > 0 {
-			scripttools.Header("commits:")
-			for _, logLine := range split {
-				fmt.Println(logLine)
-				logSplit := strings.Split(logLine, " ")
-				commits = append(commits, strings.TrimSpace(logSplit[0]))
-			}
+		if optCommits {
+			commits = scripttools.RemoveDuplicates(args)
 		} else {
-			fmt.Println("no commit found")
+			commits = getCommits(args)
 		}
 
 		// print tags and branches contain this commits
@@ -64,6 +52,31 @@ var rootCmd = &cobra.Command{
 		}
 
 	},
+}
+
+func getCommits(patterns []string) []string {
+	var logLines []string
+
+	for _, value := range patterns {
+		p := pipe.Exec("git", "--no-pager", "log", "--all", "--oneline", "-i", "--grep="+value)
+		logLines = append(logLines, scripttools.GetOutputLines(p)...)
+	}
+
+	scripttools.RemoveDuplicates(logLines)
+
+	var commits []string
+	if len(logLines) > 0 {
+		scripttools.Header("commits:")
+		for _, logLine := range logLines {
+			fmt.Println(logLine)
+			logSplit := strings.Split(logLine, " ")
+			commits = append(commits, strings.TrimSpace(logSplit[0]))
+		}
+	} else {
+		fmt.Println("no commit found")
+	}
+
+	return scripttools.RemoveDuplicates(commits)
 }
 
 // find tags
@@ -147,7 +160,7 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	// TODO Lebeda - commits
+	rootCmd.Flags().BoolVarP(&optCommits, "commits", "c", false, "use commits instead find pattern")
 	// TODO Lebeda - ignore RC
 	// TODO Lebeda - sort by numeric version padded from left/right
 	// TODO Lebeda - only tags/local branch/remote branch
