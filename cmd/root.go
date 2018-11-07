@@ -46,7 +46,7 @@ var rootCmd = &cobra.Command{
 		var commits []string
 
 		if len(split) > 0 {
-			fmt.Println("commits:")
+			scripttools.Header("commits:")
 			for _, logLine := range split {
 				fmt.Println(logLine)
 				logSplit := strings.Split(logLine, " ")
@@ -56,6 +56,7 @@ var rootCmd = &cobra.Command{
 			fmt.Println("no commit found")
 		}
 
+		// print tags and branches contain this commits
 		if len(commits) > 0 {
 			findTags(commits)
 			findBranches(commits, false)
@@ -82,8 +83,8 @@ func findTags(commits []string) {
 		//	return people[i].Age > people[j].Age
 		//})
 		sort.Strings(tags)
-		// TODO Lebeda - unique
-		fmt.Println("\ntags:")
+		tags = scripttools.RemoveDuplicates(tags)
+		scripttools.Header("\ntags:")
 		for _, tag := range tags {
 			fmt.Println(" ", tag)
 		}
@@ -116,7 +117,7 @@ func findBranches(commits []string, remote bool) {
 	if len(branches) > 0 {
 		sort.Strings(branches)
 		branches = scripttools.RemoveDuplicates(branches)
-		fmt.Println("\n" + branchType + " branches:")
+		scripttools.Header("\n" + branchType + " branches:")
 		for _, tag := range branches {
 			fmt.Println(tag)
 		}
