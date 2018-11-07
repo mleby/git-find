@@ -31,9 +31,16 @@ var optCommits bool
 var rootCmd = &cobra.Command{
 	Use:   "git-find",
 	Args:  cobra.MinimumNArgs(1),
-	Short: "find keyword in got log.",
-	Long:  `Find keyword in got log and list all commits, tags and branches contain it.`,
+	Short: "find keyword in git log.",
+	Long:  `Find keyword in git log and list all commits, tags and branches contain it.`,
+	Example: `  git-find KEY1 KEY2 ...
+  git-find AA-35210 AA-35211
+
+  git-find -c commit1 commit2 ...
+  git-find -c d7c2924b17 e9ac8dd7bd`, // TODO Lebeda - examples
+
 	// TODO Lebeda - usage
+	// TODO Lebeda - Version Flag
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// find commits
