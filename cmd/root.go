@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var optCommits bool
+var optCommits, optNoRc bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -37,9 +37,8 @@ var rootCmd = &cobra.Command{
   git-find AA-35210 AA-35211
 
   git-find -c commit1 commit2 ...
-  git-find -c d7c2924b17 e9ac8dd7bd`, // TODO Lebeda - examples
+  git-find -c d7c2924b17 e9ac8dd7bd`,
 
-	// TODO Lebeda - usage
 	// TODO Lebeda - Version Flag
 	Run: func(cmd *cobra.Command, args []string) {
 
@@ -51,9 +50,14 @@ var rootCmd = &cobra.Command{
 			commits = getCommits(args)
 		}
 
+		noPattern := ""
+		if optNoRc {
+			noPattern = "rc"
+		}
+
 		// print tags and branches contain this commits
 		if len(commits) > 0 {
-			findTags(commits)
+			findTags(commits, noPattern)
 			findBranches(commits, false)
 			findBranches(commits, true)
 		}
@@ -87,7 +91,7 @@ func getCommits(patterns []string) []string {
 }
 
 // find tags
-func findTags(commits []string) {
+func findTags(commits []string, noPattern string) {
 	var tags []string
 	for _, commit := range commits {
 		//fmt.Println("git", "tag", "--contains", commit)
@@ -104,6 +108,9 @@ func findTags(commits []string) {
 		//})
 		sort.Strings(tags)
 		tags = scripttools.RemoveDuplicates(tags)
+		if noPattern != "" {
+			tags = scripttools.RemovePattern(tags, noPattern)
+		}
 		scripttools.Header("\ntags:")
 		for _, tag := range tags {
 			fmt.Println(" ", tag)
@@ -168,7 +175,7 @@ func init() {
 	// when this action is called directly.
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	rootCmd.Flags().BoolVarP(&optCommits, "commits", "c", false, "use commits instead find pattern")
-	// TODO Lebeda - ignore RC
+	rootCmd.Flags().BoolVarP(&optNoRc, "ignore-rc", "r", false, "ignore tags with 'rc' in name")
 	// TODO Lebeda - sort by numeric version padded from left/right
 	// TODO Lebeda - only tags/local branch/remote branch
 	// TODO Lebeda - run in specific directory
