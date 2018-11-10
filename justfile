@@ -16,7 +16,7 @@ docs: install
   git commit -a -m 'rebuild docs'
   git push origin
 
-# dovnload dependencies
+# download dependencies
 dep:
   go get github.com/spf13/cobra/cobra
   go get github.com/mattn/go-sqlite3
