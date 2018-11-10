@@ -1,5 +1,5 @@
 TAG = `date +%Y%m%d`
-GITHUB_TOKEN = 'bbb4e7b26e057090e0652a518bf48b5709c7ca85'
+GITHUB_TOKEN = env_var("GITHUB_TOKEN")
 
 # build production program
 build: dep
