@@ -1,5 +1,4 @@
 TAG = `date +%Y%m%d`
-GITHUB_TOKEN = env_var("GITHUB_TOKEN")
 
 # build production program
 build: dep
@@ -43,6 +42,7 @@ clean:
 
 # make release and publish them
 release: install docs win
+  # for release must be set GITHUB_TOKEN env variable
   git tag {{TAG}}
   git push origin --tags
   gothub release --user martinlebeda --repo git-find --tag {{TAG}}
